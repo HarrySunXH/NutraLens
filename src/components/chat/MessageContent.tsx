@@ -5,11 +5,12 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import { ComponentPropsWithoutRef } from "react";
-import { ExternalLink, ShoppingCart, ImageOff, ChevronLeft, ChevronRight } from "lucide-react";
+import { ExternalLink, ShoppingCart, ImageOff, ChevronLeft, ChevronRight, BookOpen, Plus } from "lucide-react";
 import Image from "next/image";
 import DietitianSlider from "./DietitianCard";
 import QuestionCard from "./QuestionCard";
 import { parseQuestions, ParsedQuestion } from "@/utils/parseQuestions";
+import { useCart } from "@/context/CartContext";
 
 interface SupplementProduct {
   title: string;
@@ -99,25 +100,29 @@ function extractSource(url: string): string {
   }
 }
 
-// Extract all URLs from markdown content
-function extractUrls(content: string): { url: string; title: string }[] {
+// Extract all URLs from markdown content - separate products and articles
+function extractUrls(content: string): { products: { url: string; title: string }[]; articles: { url: string; title: string }[] } {
   const urlRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-  const urls: { url: string; title: string }[] = [];
+  const products: { url: string; title: string }[] = [];
+  const articles: { url: string; title: string }[] = [];
   let match;
   
   while ((match = urlRegex.exec(content)) !== null) {
     const title = match[1];
     const url = match[2];
     if (isShoppingLink(url)) {
-      urls.push({ url, title });
+      products.push({ url, title });
+    } else {
+      // Non-shopping links are considered articles
+      articles.push({ url, title });
     }
   }
   
-  return urls;
+  return { products, articles };
 }
 
-// Product Card with OG data fetching - Larger card for slider
-function ProductCard({ url, title }: { url: string; title: string }) {
+// Article Card with OG data fetching
+function ArticleCard({ url, title }: { url: string; title: string }) {
   const [ogData, setOgData] = useState<OGMetadata | null>(null);
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
@@ -148,7 +153,6 @@ function ProductCard({ url, title }: { url: string; title: string }) {
   const displayTitle = ogData?.title || title;
   const displayDescription = ogData?.description;
   const displayImage = ogData?.image;
-  const displayPrice = ogData?.price;
   const source = ogData?.siteName || extractSource(url);
 
   return (
@@ -158,8 +162,120 @@ function ProductCard({ url, title }: { url: string; title: string }) {
       rel="noopener noreferrer"
       className="flex-shrink-0 w-64 bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-emerald-300 hover:shadow-xl transition-all cursor-pointer group"
     >
-      {/* Product Image - Larger */}
+      {/* Article Image */}
       <div className="relative h-36 bg-gradient-to-br from-gray-50 to-gray-100">
+        {loading ? (
+          <div className="w-full h-full flex items-center justify-center">
+            <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : displayImage && !imageError ? (
+          <Image
+            src={displayImage}
+            alt={displayTitle}
+            fill
+            className="object-cover"
+            onError={() => setImageError(true)}
+            unoptimized
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-gray-300 bg-gradient-to-br from-gray-50 to-gray-100">
+            <BookOpen className="w-10 h-10" />
+          </div>
+        )}
+        {/* Source Badge */}
+        <div className="absolute top-2 left-2">
+          <span className="text-xs font-medium px-2 py-1 bg-white/90 backdrop-blur-sm text-gray-700 rounded-full shadow-sm">
+            {source}
+          </span>
+        </div>
+        {/* External Link Icon */}
+        <div className="absolute top-2 right-2">
+          <span className="p-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-sm group-hover:bg-emerald-500 transition-colors">
+            <ExternalLink className="w-3.5 h-3.5 text-gray-500 group-hover:text-white" />
+          </span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-3">
+        <h4 className="font-medium text-gray-900 group-hover:text-emerald-700 transition-colors line-clamp-2 text-sm leading-snug min-h-[2.5rem]">
+          {displayTitle}
+        </h4>
+
+        {displayDescription && (
+          <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">
+            {displayDescription}
+          </p>
+        )}
+
+        <div className="flex items-center justify-end mt-3 pt-2 border-t border-gray-100">
+          <span className="text-xs font-medium text-emerald-600 group-hover:text-emerald-700">
+            Read Article →
+          </span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+// Product Card with OG data fetching - Larger card for slider
+function ProductCard({ url, title }: { url: string; title: string }) {
+  const [ogData, setOgData] = useState<OGMetadata | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
+  const { addToCart } = useCart();
+
+  useEffect(() => {
+    const fetchOGData = async () => {
+      try {
+        const response = await fetch("/api/og-metadata", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setOgData(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch OG data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOGData();
+  }, [url]);
+
+  const displayTitle = ogData?.title || title;
+  const displayDescription = ogData?.description;
+  const displayImage = ogData?.image;
+  const displayPrice = ogData?.price;
+  const source = ogData?.siteName || extractSource(url);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart({
+      id: `product-${url}-${Date.now()}`,
+      title: displayTitle,
+      url: url,
+      price: displayPrice,
+      image: displayImage,
+      source: source,
+    });
+  };
+
+  return (
+    <div className="flex-shrink-0 w-64 bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-emerald-300 hover:shadow-xl transition-all group">
+      {/* Product Image - Larger */}
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block relative h-36 bg-gradient-to-br from-gray-50 to-gray-100"
+      >
         {loading ? (
           <div className="w-full h-full flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -190,114 +306,214 @@ function ProductCard({ url, title }: { url: string; title: string }) {
             <ExternalLink className="w-3.5 h-3.5 text-gray-500 group-hover:text-white" />
           </span>
         </div>
-      </div>
+      </a>
 
       {/* Content */}
       <div className="p-3">
-        <h4 className="font-medium text-gray-900 group-hover:text-emerald-700 transition-colors line-clamp-2 text-sm leading-snug min-h-[2.5rem]">
-          {displayTitle}
-        </h4>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+        >
+          <h4 className="font-medium text-gray-900 group-hover:text-emerald-700 transition-colors line-clamp-2 text-sm leading-snug min-h-[2.5rem]">
+            {displayTitle}
+          </h4>
 
-        {displayDescription && (
-          <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">
-            {displayDescription}
-          </p>
-        )}
-
-        <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
-          {displayPrice ? (
-            <span className="text-base font-bold text-emerald-600">{displayPrice}</span>
-          ) : (
-            <span className="text-xs text-gray-400">View price</span>
+          {displayDescription && (
+            <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">
+              {displayDescription}
+            </p>
           )}
-          <span className="text-xs font-medium text-emerald-600 group-hover:text-emerald-700">
-            Shop Now →
-          </span>
+        </a>
+
+        <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-100 gap-2">
+          <div className="flex-1">
+            {displayPrice ? (
+              <span className="text-base font-bold text-emerald-600">{displayPrice}</span>
+            ) : (
+              <span className="text-xs text-gray-400">View price</span>
+            )}
+          </div>
+          <button
+            onClick={handleAddToCart}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-medium hover:bg-emerald-600 transition-colors cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add to Cart
+          </button>
         </div>
       </div>
-    </a>
+    </div>
   );
 }
 
-// Products Section - Horizontal slider with larger cards
-function ProductsSection({ products }: { products: { url: string; title: string }[] }) {
-  const sliderRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+// Products and Articles Section - Horizontal slider with larger cards
+function ProductsAndArticlesSection({ 
+  products, 
+  articles 
+}: { 
+  products: { url: string; title: string }[];
+  articles: { url: string; title: string }[];
+}) {
+  const productsSliderRef = useRef<HTMLDivElement>(null);
+  const articlesSliderRef = useRef<HTMLDivElement>(null);
+  const [productsCanScrollLeft, setProductsCanScrollLeft] = useState(false);
+  const [productsCanScrollRight, setProductsCanScrollRight] = useState(true);
+  const [articlesCanScrollLeft, setArticlesCanScrollLeft] = useState(false);
+  const [articlesCanScrollRight, setArticlesCanScrollRight] = useState(true);
 
-  if (products.length === 0) return null;
+  if (products.length === 0 && articles.length === 0) return null;
 
-  const checkScrollability = () => {
-    if (sliderRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;
-      setCanScrollLeft(scrollLeft > 0);
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+  const checkProductsScrollability = () => {
+    if (productsSliderRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = productsSliderRef.current;
+      setProductsCanScrollLeft(scrollLeft > 0);
+      setProductsCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
     }
   };
 
-  const scroll = (direction: "left" | "right") => {
-    if (sliderRef.current) {
+  const checkArticlesScrollability = () => {
+    if (articlesSliderRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = articlesSliderRef.current;
+      setArticlesCanScrollLeft(scrollLeft > 0);
+      setArticlesCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  const scrollProducts = (direction: "left" | "right") => {
+    if (productsSliderRef.current) {
       const scrollAmount = 280;
-      sliderRef.current.scrollBy({
+      productsSliderRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
       });
-      setTimeout(checkScrollability, 300);
+      setTimeout(checkProductsScrollability, 300);
+    }
+  };
+
+  const scrollArticles = (direction: "left" | "right") => {
+    if (articlesSliderRef.current) {
+      const scrollAmount = 280;
+      articlesSliderRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+      setTimeout(checkArticlesScrollability, 300);
     }
   };
 
   return (
-    <div className="mt-6 pt-4 border-t border-gray-200">
-      {/* Header with navigation */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
-            <ShoppingCart className="w-4 h-4 text-white" />
+    <div className="mt-6 pt-4 border-t border-gray-200 space-y-6">
+      {/* Products Section */}
+      {products.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                <ShoppingCart className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Recommended Products</h3>
+                <p className="text-xs text-gray-500">Click to view and purchase</p>
+              </div>
+            </div>
+            
+            {/* Navigation Arrows */}
+            {products.length > 2 && (
+              <div className="flex gap-1">
+                <button
+                  onClick={() => scrollProducts("left")}
+                  className={`p-2 rounded-full transition-colors cursor-pointer ${
+                    productsCanScrollLeft
+                      ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      : "bg-gray-50 text-gray-300"
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => scrollProducts("right")}
+                  className={`p-2 rounded-full transition-colors cursor-pointer ${
+                    productsCanScrollRight
+                      ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      : "bg-gray-50 text-gray-300"
+                  }`}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
           </div>
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900">Recommended Products</h3>
-            <p className="text-xs text-gray-500">Click to view and purchase</p>
+
+          {/* Horizontal Slider */}
+          <div
+            ref={productsSliderRef}
+            onScroll={checkProductsScrollability}
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {products.map((product, index) => (
+              <ProductCard key={`${product.url}-${index}`} url={product.url} title={product.title} />
+            ))}
           </div>
         </div>
-        
-        {/* Navigation Arrows */}
-        {products.length > 2 && (
-          <div className="flex gap-1">
-            <button
-              onClick={() => scroll("left")}
-              className={`p-2 rounded-full transition-colors cursor-pointer ${
-                canScrollLeft
-                  ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                  : "bg-gray-50 text-gray-300"
-              }`}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => scroll("right")}
-              className={`p-2 rounded-full transition-colors cursor-pointer ${
-                canScrollRight
-                  ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                  : "bg-gray-50 text-gray-300"
-              }`}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-      </div>
+      )}
 
-      {/* Horizontal Slider */}
-      <div
-        ref={sliderRef}
-        onScroll={checkScrollability}
-        className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-      >
-        {products.map((product, index) => (
-          <ProductCard key={`${product.url}-${index}`} url={product.url} title={product.title} />
-        ))}
-      </div>
+      {/* Articles Section */}
+      {articles.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
+                <BookOpen className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900">Relevant Articles</h3>
+                <p className="text-xs text-gray-500">Click to read more</p>
+              </div>
+            </div>
+            
+            {/* Navigation Arrows */}
+            {articles.length > 2 && (
+              <div className="flex gap-1">
+                <button
+                  onClick={() => scrollArticles("left")}
+                  className={`p-2 rounded-full transition-colors cursor-pointer ${
+                    articlesCanScrollLeft
+                      ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      : "bg-gray-50 text-gray-300"
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => scrollArticles("right")}
+                  className={`p-2 rounded-full transition-colors cursor-pointer ${
+                    articlesCanScrollRight
+                      ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      : "bg-gray-50 text-gray-300"
+                  }`}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Horizontal Slider */}
+          <div
+            ref={articlesSliderRef}
+            onScroll={checkArticlesScrollability}
+            className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {articles.map((article, index) => (
+              <ArticleCard key={`${article.url}-${index}`} url={article.url} title={article.title} />
+            ))}
+          </div>
+        </div>
+      )}
 
       <p className="text-xs text-gray-400 italic mt-3">
         External links. Always verify products before purchasing.
@@ -319,8 +535,11 @@ export default function MessageContent({
     [content]
   );
   
-  // Also extract any product URLs from content as fallback
-  const contentProducts = useMemo(() => extractUrls(contentWithoutQuestions), [contentWithoutQuestions]);
+  // Extract product and article URLs from content
+  const { products: contentProducts, articles: contentArticles } = useMemo(
+    () => extractUrls(contentWithoutQuestions),
+    [contentWithoutQuestions]
+  );
   
   // Combine passed products with any extracted from content
   const allProducts = useMemo(() => {
@@ -328,13 +547,17 @@ export default function MessageContent({
     return contentProducts;
   }, [products, contentProducts]);
   
-  // Remove product links from content for cleaner display
+  // Use extracted articles from content
+  const allArticles = useMemo(() => contentArticles, [contentArticles]);
+  
+  // Remove product and article links from content for cleaner display
   const cleanedContent = useMemo(() => {
-    if (contentProducts.length === 0) return contentWithoutQuestions;
+    const allLinks = [...contentProducts, ...contentArticles];
+    if (allLinks.length === 0) return contentWithoutQuestions;
     
     let cleaned = contentWithoutQuestions;
-    // Remove markdown links that are shopping links
-    contentProducts.forEach(({ url, title }) => {
+    // Remove markdown links
+    allLinks.forEach(({ url, title }) => {
       // Remove the full markdown link
       cleaned = cleaned.replace(`[${title}](${url})`, "");
     });
@@ -346,7 +569,7 @@ export default function MessageContent({
       .trim();
     
     return cleaned;
-  }, [contentWithoutQuestions, contentProducts]);
+  }, [contentWithoutQuestions, contentProducts, contentArticles]);
 
   return (
     <div className="prose prose-gray max-w-none">
@@ -546,10 +769,10 @@ export default function MessageContent({
         {cleanedContent}
       </ReactMarkdown>
       
-      {/* Product cards and dietitians - only show after streaming is complete with fade-in */}
-      {!isStreaming && allProducts.length > 0 && (
+      {/* Product cards, articles, and dietitians - only show after streaming is complete with fade-in */}
+      {!isStreaming && (allProducts.length > 0 || allArticles.length > 0) && (
         <div className="animate-fade-in">
-          <ProductsSection products={allProducts} />
+          <ProductsAndArticlesSection products={allProducts} articles={allArticles} />
           <DietitianSlider />
         </div>
       )}

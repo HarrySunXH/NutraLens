@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Leaf, Menu, X, MessageSquare } from "lucide-react";
+import { Leaf, Menu, X, MessageSquare, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -13,6 +14,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const isHomePage = pathname === "/";
+  const { setIsOpen, itemCount } = useCart();
 
   const navLinks = [
     { href: "#how-it-works", label: "How It Works", id: "how-it-works", isSection: true },
@@ -172,14 +174,18 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* CTA Button */}
+          {/* Cart Button */}
           <div className="hidden md:block">
             <button 
-              onClick={() => router.push("/chat")}
-              className="relative px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold overflow-hidden group cursor-pointer"
+              onClick={() => setIsOpen(true)}
+              className="relative p-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 transition-all cursor-pointer group"
             >
-              <span className="relative z-10">Get Started</span>
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <ShoppingCart className="w-5 h-5" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {itemCount > 9 ? '9+' : itemCount}
+                </span>
+              )}
             </button>
           </div>
 
@@ -264,11 +270,17 @@ export default function Navbar() {
             <button 
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                router.push("/chat");
+                setIsOpen(true);
               }}
-              className="w-full mt-4 px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold cursor-pointer"
+              className="w-full mt-4 px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold cursor-pointer flex items-center justify-center gap-2"
             >
-              Get Started
+              <ShoppingCart className="w-5 h-5" />
+              Shop Our Products
+              {itemCount > 0 && (
+                <span className="ml-1 px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded-full">
+                  {itemCount > 9 ? '9+' : itemCount}
+                </span>
+              )}
             </button>
           </div>
         </motion.div>
