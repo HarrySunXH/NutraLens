@@ -187,6 +187,19 @@ function extractSource(url: string): string {
   }
 }
 
+// Partner retailers to prioritize
+const PARTNER_RETAILERS = ["cvs.com", "walgreens.com", "gnc.com"];
+
+// Check if URL is from a partner retailer
+function isPartnerRetailer(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return PARTNER_RETAILERS.some(partner => hostname.includes(partner));
+  } catch {
+    return false;
+  }
+}
+
 // Filter results to prioritize shopping/product pages
 function isProductResult(result: { title: string; description: string }): boolean {
   const productIndicators = [
@@ -208,23 +221,19 @@ function isProductResult(result: { title: string; description: string }): boolea
   return productIndicators.some((indicator) => text.includes(indicator));
 }
 
-// Direct Brave Search API call
-async function searchSupplements(query: string): Promise<SupplementProduct[]> {
-  const apiKey = process.env.BRAVE_SEARCH_API_KEY;
-  
-  if (!apiKey) {
-    console.log("Brave Search API key not configured, skipping product search");
-    return [];
-  }
-
+// Search a specific retailer
+async function searchRetailer(
+  apiKey: string,
+  query: string,
+  retailer: string,
+  retailerDomain: string
+): Promise<SupplementProduct[]> {
   try {
-    // Add supplement/buy keywords to improve product results
-    const enhancedQuery = `${query} buy supplement online`;
-
+    const retailerQuery = `${query} site:${retailerDomain}`;
     const response = await fetch(
       `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(
-        enhancedQuery
-      )}&count=10&safesearch=moderate`,
+        retailerQuery
+      )}&count=3&safesearch=moderate`,
       {
         headers: {
           Accept: "application/json",
@@ -235,27 +244,241 @@ async function searchSupplements(query: string): Promise<SupplementProduct[]> {
     );
 
     if (!response.ok) {
-      console.error("Brave Search API error:", response.status, await response.text());
       return [];
     }
 
     const data = await response.json();
     const webResults = data.web?.results || [];
 
-    // Filter and transform results
-    const products: SupplementProduct[] = webResults
+    return webResults
       .filter(isProductResult)
-      .slice(0, 5)
       .map((result: { title: string; url: string; description: string }) => ({
         title: result.title,
         url: result.url,
         description: result.description,
-        source: extractSource(result.url),
+        source: retailer,
         price: extractPrice(`${result.title} ${result.description}`),
       }));
+  } catch (error) {
+    console.error(`Error searching ${retailer}:`, error);
+    return [];
+  }
+}
 
-    console.log(`Found ${products.length} products for query: "${query}"`);
-    return products;
+// Validate search results using AI
+async function validateSearchResults(
+  query: string,
+  products: SupplementProduct[]
+): Promise<{ isValid: boolean; improvedQuery?: string; reason?: string }> {
+  if (!process.env.GROQ_API_KEY || products.length === 0) {
+    return { isValid: true }; // Skip validation if no API key or no products
+  }
+
+  try {
+    const productsSummary = products.map((p, i) => 
+      `${i + 1}. ${p.title} (${p.source}) - ${p.description?.substring(0, 100) || 'No description'}`
+    ).join('\n');
+
+    const validationPrompt = `You are a supplement search validator. Analyze if these search results match the user's query.
+
+User Query: "${query}"
+
+Search Results:
+${productsSummary}
+
+Evaluate:
+1. Are these results relevant supplements/products that match the query?
+2. Are they from the correct retailers (CVS, Walgreens, GNC)?
+3. Do they appear to be actual purchasable products (not articles, reviews, or unrelated pages)?
+
+Respond in JSON format:
+{
+  "isValid": true/false,
+  "reason": "brief explanation",
+  "improvedQuery": "suggested improved search query if invalid, or null if valid"
+}
+
+Only mark as invalid if results are clearly wrong (wrong products, wrong retailers, not supplements, etc.).`;
+
+    const response = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: "You are a precise supplement search validator. Respond only with valid JSON.",
+        },
+        {
+          role: "user",
+          content: validationPrompt,
+        },
+      ],
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.3,
+      max_tokens: 200,
+      response_format: { type: "json_object" },
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (content) {
+      const validation = JSON.parse(content);
+      return {
+        isValid: validation.isValid === true,
+        improvedQuery: validation.improvedQuery || undefined,
+        reason: validation.reason,
+      };
+    }
+  } catch (error) {
+    console.error("Validation error:", error);
+    // If validation fails, assume results are valid to avoid blocking
+    return { isValid: true };
+  }
+
+  return { isValid: true };
+}
+
+// Perform search with validation and retry logic
+async function performValidatedSearch(
+  apiKey: string,
+  originalQuery: string,
+  attempt: number = 1
+): Promise<SupplementProduct[]> {
+  const currentQuery = attempt === 1 ? originalQuery : originalQuery;
+
+  // First, search each partner retailer specifically
+  const partnerSearches = await Promise.all([
+    searchRetailer(apiKey, currentQuery, "CVS", "cvs.com"),
+    searchRetailer(apiKey, currentQuery, "Walgreens", "walgreens.com"),
+    searchRetailer(apiKey, currentQuery, "GNC", "gnc.com"),
+  ]);
+
+  // Get at least one product from each partner
+  const cvsProducts = partnerSearches[0];
+  const walgreensProducts = partnerSearches[1];
+  const gncProducts = partnerSearches[2];
+
+  // Build result array: one from each partner
+  const partnerProducts: SupplementProduct[] = [];
+  if (cvsProducts.length > 0) partnerProducts.push(cvsProducts[0]);
+  if (walgreensProducts.length > 0) partnerProducts.push(walgreensProducts[0]);
+  if (gncProducts.length > 0) partnerProducts.push(gncProducts[0]);
+
+  // If we have products from all three partners, validate them
+  if (partnerProducts.length >= 3) {
+    const validation = await validateSearchResults(currentQuery, partnerProducts);
+    
+    if (validation.isValid || attempt >= 3) {
+      // Valid results or max attempts reached
+      if (!validation.isValid && attempt >= 3) {
+        console.log(`Validation failed after ${attempt} attempts, returning results anyway`);
+      } else {
+        console.log(`Found validated products from all 3 partners for query: "${currentQuery}"`);
+      }
+      return partnerProducts.slice(0, 3);
+    }
+
+    // Invalid results and we can retry - use improved query if provided
+    if (attempt < 3 && validation.improvedQuery) {
+      console.log(`Validation failed (attempt ${attempt}): ${validation.reason}. Retrying with: ${validation.improvedQuery}`);
+      return performValidatedSearch(apiKey, validation.improvedQuery, attempt + 1);
+    }
+  }
+
+  // If we don't have all three, try to fill with additional products from partners
+  const allPartnerProducts = partnerSearches.flat();
+  const seenPartnerUrls = new Set(partnerProducts.map(p => p.url));
+  const additionalPartnerProducts = allPartnerProducts
+    .filter(p => !seenPartnerUrls.has(p.url))
+    .slice(0, Math.max(0, 5 - partnerProducts.length));
+
+  const finalPartnerProducts = [...partnerProducts, ...additionalPartnerProducts];
+
+  // Validate partner products if we have enough
+  if (finalPartnerProducts.length >= 3) {
+    const validation = await validateSearchResults(currentQuery, finalPartnerProducts.slice(0, 3));
+    
+    if (!validation.isValid && attempt < 3 && validation.improvedQuery) {
+      console.log(`Validation failed (attempt ${attempt}): ${validation.reason}. Retrying with: ${validation.improvedQuery}`);
+      return performValidatedSearch(apiKey, validation.improvedQuery, attempt + 1);
+    }
+  }
+
+  // If we have enough partner results (5+), return them
+  if (finalPartnerProducts.length >= 5) {
+    console.log(`Found ${finalPartnerProducts.length} partner products for query: "${currentQuery}"`);
+    return finalPartnerProducts.slice(0, 5);
+  }
+
+  // Otherwise, do a general search and prioritize partner results
+  const enhancedQuery = `${currentQuery} buy supplement online`;
+  const response = await fetch(
+    `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(
+      enhancedQuery
+    )}&count=15&safesearch=moderate`,
+    {
+      headers: {
+        Accept: "application/json",
+        "Accept-Encoding": "gzip",
+        "X-Subscription-Token": apiKey,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    // If general search fails, return partner results we have
+    console.log(`Found ${finalPartnerProducts.length} partner products (general search failed) for query: "${currentQuery}"`);
+    return finalPartnerProducts.slice(0, 5);
+  }
+
+  const data = await response.json();
+  const webResults = data.web?.results || [];
+
+  // Filter and transform results
+  const allProducts: SupplementProduct[] = webResults
+    .filter(isProductResult)
+    .map((result: { title: string; url: string; description: string }) => ({
+      title: result.title,
+      url: result.url,
+      description: result.description,
+      source: extractSource(result.url),
+      price: extractPrice(`${result.title} ${result.description}`),
+    }));
+
+  // Separate partner and non-partner products
+  const partnerResults = allProducts.filter(p => isPartnerRetailer(p.url));
+  const otherResults = allProducts.filter(p => !isPartnerRetailer(p.url));
+
+  // Combine: partner results first, then others, avoiding duplicates
+  const seenAllUrls = new Set(finalPartnerProducts.map(p => p.url));
+  const additionalProducts = [...partnerResults, ...otherResults]
+    .filter(p => !seenAllUrls.has(p.url))
+    .slice(0, Math.max(0, 5 - finalPartnerProducts.length));
+
+  const finalProducts = [...finalPartnerProducts, ...additionalProducts].slice(0, 5);
+
+  // Validate final results
+  if (finalProducts.length >= 3) {
+    const validation = await validateSearchResults(currentQuery, finalProducts.slice(0, 3));
+    
+    if (!validation.isValid && attempt < 3 && validation.improvedQuery) {
+      console.log(`Final validation failed (attempt ${attempt}): ${validation.reason}. Retrying with: ${validation.improvedQuery}`);
+      return performValidatedSearch(apiKey, validation.improvedQuery, attempt + 1);
+    }
+  }
+
+  console.log(`Found ${finalProducts.length} products (${finalPartnerProducts.length} from partners, ${partnerProducts.length >= 3 ? 'all 3 partners represented' : 'partial partner coverage'}) for query: "${currentQuery}"`);
+  return finalProducts;
+}
+
+// Direct Brave Search API call - prioritizes partner retailers with validation
+async function searchSupplements(query: string): Promise<SupplementProduct[]> {
+  const apiKey = process.env.BRAVE_SEARCH_API_KEY;
+  
+  if (!apiKey) {
+    console.log("Brave Search API key not configured, skipping product search");
+    return [];
+  }
+
+  try {
+    return await performValidatedSearch(apiKey, query, 1);
   } catch (error) {
     console.error("Error searching supplements:", error);
     return [];

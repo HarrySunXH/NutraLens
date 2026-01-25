@@ -218,12 +218,37 @@ function ArticleCard({ url, title }: { url: string; title: string }) {
   );
 }
 
+// Get retailer logo path based on source
+function getRetailerLogo(source: string): string | null {
+  const sourceLower = source.toLowerCase();
+  if (sourceLower.includes("cvs")) {
+    return "/partners/cvs-logo.png";
+  } else if (sourceLower.includes("walgreens")) {
+    return "/partners/walgreens-logo.jpg";
+  } else if (sourceLower.includes("gnc")) {
+    return "/partners/gnc-logo.png";
+  }
+  return null;
+}
+
+// Check if URL is from a partner retailer
+function isPartnerRetailerUrl(url: string): boolean {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return hostname.includes("cvs.com") || hostname.includes("walgreens.com") || hostname.includes("gnc.com");
+  } catch {
+    return false;
+  }
+}
+
 // Product Card with OG data fetching - Larger card for slider
 function ProductCard({ url, title }: { url: string; title: string }) {
   const [ogData, setOgData] = useState<OGMetadata | null>(null);
   const [loading, setLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const { addToCart } = useCart();
+  const isPartner = isPartnerRetailerUrl(url);
 
   useEffect(() => {
     const fetchOGData = async () => {
@@ -237,8 +262,15 @@ function ProductCard({ url, title }: { url: string; title: string }) {
         if (response.ok) {
           const data = await response.json();
           setOgData(data);
+        } else if (response.status === 403) {
+          // 403 is common for some sites - that's okay, we have fallbacks
+          if (isPartner) {
+            // For partners, we use our logos anyway, so this is fine
+            console.log(`OG metadata blocked for partner site (using logo): ${url}`);
+          }
         }
       } catch (error) {
+        // Silently handle errors - we'll use fallbacks (logos for partners, cart icon for others)
         console.error("Failed to fetch OG data:", error);
       } finally {
         setLoading(false);
@@ -246,13 +278,14 @@ function ProductCard({ url, title }: { url: string; title: string }) {
     };
 
     fetchOGData();
-  }, [url]);
+  }, [url, isPartner]);
 
   const displayTitle = ogData?.title || title;
   const displayDescription = ogData?.description;
   const displayImage = ogData?.image;
   const displayPrice = ogData?.price;
   const source = ogData?.siteName || extractSource(url);
+  const retailerLogo = getRetailerLogo(source);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -279,6 +312,18 @@ function ProductCard({ url, title }: { url: string; title: string }) {
         {loading ? (
           <div className="w-full h-full flex items-center justify-center">
             <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : retailerLogo && !logoError ? (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+            <Image
+              src={retailerLogo}
+              alt={`${source} logo`}
+              width={120}
+              height={60}
+              className="object-contain max-w-full max-h-full"
+              onError={() => setLogoError(true)}
+              unoptimized
+            />
           </div>
         ) : displayImage && !imageError ? (
           <Image

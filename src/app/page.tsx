@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import Partners from "@/components/Partners";
 import ProblemCards from "@/components/ProblemCards";
 import HowItWorks from "@/components/HowItWorks";
 import FeaturesBento from "@/components/FeaturesBento";
@@ -14,6 +15,7 @@ export default function Home() {
       <Navbar />
       <main>
         <Hero />
+        <Partners />
         <ProblemCards />
         <HowItWorks />
         <FeaturesBento />
