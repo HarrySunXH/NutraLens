@@ -25,6 +25,8 @@ export default function QuestionCard({
     if (answered) return;
     setSelectedOption(option);
     setCustomInput("");
+    // Automatically send the answer when an option is selected
+    onAnswer(option);
   };
 
   const handleSubmit = () => {

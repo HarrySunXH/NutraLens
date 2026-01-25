@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
 
 // DNA Helix Component
@@ -255,6 +256,8 @@ const HexGrid = () => (
 );
 
 export default function Hero() {
+  const router = useRouter();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-mesh pt-20">
       {/* Hexagonal Grid Background */}
@@ -391,15 +394,32 @@ export default function Hero() {
           variants={fadeInUp}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <button className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300">
+          <button 
+            onClick={() => router.push("/chat")}
+            className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-lg overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300 cursor-pointer"
+          >
             <span className="relative z-10 flex items-center space-x-2">
-              <span>Analyze My Supplements</span>
+              <span>Start Chat</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" />
             </span>
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </button>
 
-          <button className="group px-8 py-4 rounded-full glass-strong text-gray-700 font-semibold text-lg hover:bg-white/20 transition-all duration-300">
+          <button 
+            onClick={() => {
+              const element = document.getElementById("how-it-works");
+              if (element) {
+                const offset = 80;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - offset;
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: "smooth",
+                });
+              }
+            }}
+            className="group px-8 py-4 rounded-full glass-strong text-gray-700 font-semibold text-lg hover:bg-white/20 transition-all duration-300 cursor-pointer"
+          >
             <span className="flex items-center space-x-2">
               <span>See How It Works</span>
               <svg

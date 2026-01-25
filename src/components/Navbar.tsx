@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Leaf, Menu, X, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
   const isHomePage = pathname === "/";
 
   const navLinks = [
@@ -173,7 +174,10 @@ export default function Navbar() {
 
           {/* CTA Button */}
           <div className="hidden md:block">
-            <button className="relative px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold overflow-hidden group">
+            <button 
+              onClick={() => router.push("/chat")}
+              className="relative px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold overflow-hidden group cursor-pointer"
+            >
               <span className="relative z-10">Get Started</span>
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
@@ -182,7 +186,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg glass"
+            className="md:hidden p-2 rounded-lg glass cursor-pointer"
           >
             {isMobileMenuOpen ? (
               <X className="w-6 h-6 text-gray-700" />
@@ -257,7 +261,13 @@ export default function Navbar() {
                 </Link>
               );
             })}
-            <button className="w-full mt-4 px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold">
+            <button 
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                router.push("/chat");
+              }}
+              className="w-full mt-4 px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold cursor-pointer"
+            >
               Get Started
             </button>
           </div>

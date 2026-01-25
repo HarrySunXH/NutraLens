@@ -128,7 +128,7 @@ export default function CTASection() {
               </div>
               <button
                 type="submit"
-                className="group px-8 py-4 rounded-full bg-white text-emerald-600 font-semibold text-lg hover:bg-emerald-50 transition-all duration-300 shadow-2xl hover:shadow-white/20 hover:scale-105"
+                className="group px-8 py-4 rounded-full bg-white text-emerald-600 font-semibold text-lg hover:bg-emerald-50 transition-all duration-300 shadow-2xl hover:shadow-white/20 hover:scale-105 cursor-pointer"
               >
                 <span className="flex items-center justify-center space-x-2">
                   <span>Get Started Free</span>
