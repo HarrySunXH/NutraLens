@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+let groq: Groq | null = null;
+
+function getGroqClient(): Groq {
+  if (!groq) {
+    groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return groq;
+}
 
 interface BraveSearchResult {
   title: string;
@@ -131,7 +136,7 @@ Respond in JSON format:
 
 Only mark as invalid if results are clearly wrong (wrong products, wrong retailers, not supplements, etc.).`;
 
-    const response = await groq.chat.completions.create({
+    const response = await getGroqClient().chat.completions.create({
       messages: [
         {
           role: "system",

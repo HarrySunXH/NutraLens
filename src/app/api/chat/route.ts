@@ -2,9 +2,14 @@ import { NextRequest } from "next/server";
 import Groq from "groq-sdk";
 import { HealthProfile } from "@/types/health-profile";
 
-const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
-});
+let groq: Groq | null = null;
+
+function getGroqClient(): Groq {
+  if (!groq) {
+    groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+  }
+  return groq;
+}
 
 // Supplement product interface
 interface SupplementProduct {
@@ -300,7 +305,7 @@ Respond in JSON format:
 
 Only mark as invalid if results are clearly wrong (wrong products, wrong retailers, not supplements, etc.).`;
 
-    const response = await groq.chat.completions.create({
+    const response = await getGroqClient().chat.completions.create({
       messages: [
         {
           role: "system",
@@ -650,7 +655,7 @@ export async function POST(req: NextRequest) {
     ];
 
     // Create streaming response
-    const stream = await groq.chat.completions.create({
+    const stream = await getGroqClient().chat.completions.create({
       messages: groqMessages,
       model: "llama-3.3-70b-versatile",
       temperature: 0.6, // Slightly lower for more focused responses
