@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Leaf, Menu, X, MessageSquare, ShoppingCart } from "lucide-react";
+import { Leaf, Menu, X, MessageSquare, ShoppingCart, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
@@ -20,6 +20,7 @@ export default function Navbar() {
     { href: "#how-it-works", label: "How It Works", id: "how-it-works", isSection: true },
     { href: "#features", label: "Features", id: "features", isSection: true },
     { href: "/chat", label: "AI Chat", id: "chat", isSection: false },
+    { href: "/community", label: "Community", id: "community", isSection: false },
   ];
 
   useEffect(() => {
@@ -160,6 +161,7 @@ export default function Navbar() {
                   }`}
                 >
                   {link.id === "chat" && <MessageSquare className="w-4 h-4" />}
+                  {link.id === "community" && <Users className="w-4 h-4" />}
                   {link.label}
                   {isActive && (
                     <motion.div
@@ -263,11 +265,12 @@ export default function Navbar() {
                   }`}
                 >
                   {link.id === "chat" && <MessageSquare className="w-4 h-4" />}
+                  {link.id === "community" && <Users className="w-4 h-4" />}
                   {link.label}
                 </Link>
               );
             })}
-            <button 
+            <button
               onClick={() => {
                 setIsMobileMenuOpen(false);
                 setIsOpen(true);
