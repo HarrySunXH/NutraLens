@@ -814,10 +814,16 @@ export default function MessageContent({
         {cleanedContent}
       </ReactMarkdown>
       
-      {/* Product cards, articles, and dietitians - only show after streaming is complete with fade-in */}
+      {/* Product cards and articles - only show after streaming is complete with fade-in */}
       {!isStreaming && (allProducts.length > 0 || allArticles.length > 0) && (
         <div className="animate-fade-in">
           <ProductsAndArticlesSection products={allProducts} articles={allArticles} />
+        </div>
+      )}
+
+      {/* Dietitian slider - always show after streaming completes */}
+      {!isStreaming && (
+        <div className="animate-fade-in">
           <DietitianSlider />
         </div>
       )}

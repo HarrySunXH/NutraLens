@@ -22,6 +22,7 @@ interface ListItem {
   reviews: number;
   badge?: string;
   reason: string;
+  evidenceLevel: "strong" | "emerging" | "limited";
 }
 
 interface SupplementList {
@@ -47,11 +48,11 @@ const LISTS: SupplementList[] = [
     updatedAt: "Updated 2 days ago",
     saves: 1842,
     items: [
-      { rank: 1, name: "Magnesium Glycinate", brand: "Thorne Research", score: 4.8, reviews: 1243, badge: "Community Pick", reason: "Fastest onset, minimal side effects, high bioavailability" },
-      { rank: 2, name: "L-Theanine", brand: "NOW Foods", score: 4.6, reviews: 876, reason: "Promotes relaxation without drowsiness, stacks well with other sleep aids" },
-      { rank: 3, name: "Ashwagandha KSM-66", brand: "Jarrow Formulas", score: 4.5, reviews: 832, reason: "Reduces cortisol levels that disrupt sleep cycles" },
-      { rank: 4, name: "Melatonin 0.5mg", brand: "Life Extension", score: 4.4, reviews: 654, badge: "Low Dose", reason: "Lower dose outperforms higher doses for most users in community data" },
-      { rank: 5, name: "Apigenin", brand: "Swanson", score: 4.2, reviews: 312, reason: "Emerging favorite — users report deeper, more restorative sleep" },
+      { rank: 1, name: "Magnesium Glycinate", brand: "Thorne Research", score: 4.8, reviews: 1243, badge: "Community Pick", reason: "Fastest onset, minimal side effects, high bioavailability", evidenceLevel: "strong" },
+      { rank: 2, name: "L-Theanine", brand: "NOW Foods", score: 4.6, reviews: 876, reason: "Promotes relaxation without drowsiness, stacks well with other sleep aids", evidenceLevel: "emerging" },
+      { rank: 3, name: "Ashwagandha KSM-66", brand: "Jarrow Formulas", score: 4.5, reviews: 832, reason: "Reduces cortisol levels that disrupt sleep cycles", evidenceLevel: "emerging" },
+      { rank: 4, name: "Melatonin 0.5mg", brand: "Life Extension", score: 4.4, reviews: 654, badge: "Low Dose", reason: "Lower dose outperforms higher doses for most users in community data", evidenceLevel: "strong" },
+      { rank: 5, name: "Apigenin", brand: "Swanson", score: 4.2, reviews: 312, reason: "Emerging favorite — users report deeper, more restorative sleep", evidenceLevel: "emerging" },
     ],
   },
   {
@@ -64,11 +65,11 @@ const LISTS: SupplementList[] = [
     updatedAt: "Updated 1 day ago",
     saves: 2310,
     items: [
-      { rank: 1, name: "Creatine Monohydrate", brand: "Optimum Nutrition", score: 4.9, reviews: 2108, badge: "Most Researched", reason: "Most evidence-backed supplement for strength and power output" },
-      { rank: 2, name: "Whey Protein Isolate", brand: "Dymatize", score: 4.7, reviews: 1890, reason: "Fastest absorption post-workout, high leucine content triggers MPS" },
-      { rank: 3, name: "Beta-Alanine", brand: "NOW Sports", score: 4.4, reviews: 743, reason: "Reduces muscle fatigue, extends time to exhaustion in high-rep sets" },
-      { rank: 4, name: "Citrulline Malate", brand: "BulkSupplements", score: 4.3, reviews: 601, badge: "Best Value", reason: "Enhances blood flow and reduces soreness — underrated by community" },
-      { rank: 5, name: "Vitamin D3 + K2", brand: "Life Extension", score: 4.3, reviews: 987, reason: "Low vitamin D strongly correlated with reduced testosterone and strength" },
+      { rank: 1, name: "Creatine Monohydrate", brand: "Optimum Nutrition", score: 4.9, reviews: 2108, badge: "Most Researched", reason: "Most evidence-backed supplement for strength and power output", evidenceLevel: "strong" },
+      { rank: 2, name: "Whey Protein Isolate", brand: "Dymatize", score: 4.7, reviews: 1890, reason: "Fastest absorption post-workout, high leucine content triggers MPS", evidenceLevel: "strong" },
+      { rank: 3, name: "Beta-Alanine", brand: "NOW Sports", score: 4.4, reviews: 743, reason: "Reduces muscle fatigue, extends time to exhaustion in high-rep sets", evidenceLevel: "strong" },
+      { rank: 4, name: "Citrulline Malate", brand: "BulkSupplements", score: 4.3, reviews: 601, badge: "Best Value", reason: "Enhances blood flow and reduces soreness — underrated by community", evidenceLevel: "emerging" },
+      { rank: 5, name: "Vitamin D3 + K2", brand: "Life Extension", score: 4.3, reviews: 987, reason: "Low vitamin D strongly correlated with reduced testosterone and strength", evidenceLevel: "strong" },
     ],
   },
   {
@@ -81,11 +82,11 @@ const LISTS: SupplementList[] = [
     updatedAt: "Updated 3 days ago",
     saves: 1567,
     items: [
-      { rank: 1, name: "Lion's Mane Mushroom", brand: "Host Defense", score: 4.7, reviews: 689, badge: "Rising Star", reason: "NGF stimulation linked to memory and long-term cognitive support" },
-      { rank: 2, name: "Rhodiola Rosea", brand: "Gaia Herbs", score: 4.5, reviews: 521, reason: "Reduces mental fatigue during high cognitive load — popular with students" },
-      { rank: 3, name: "Alpha-GPC", brand: "NOW Foods", score: 4.5, reviews: 448, reason: "Directly raises acetylcholine; users report sharper focus within hours" },
-      { rank: 4, name: "L-Theanine + Caffeine", brand: "Nutricost", score: 4.4, reviews: 912, badge: "Starter Pick", reason: "Classic combo — smooth energy without the jitter crash" },
-      { rank: 5, name: "Bacopa Monnieri", brand: "Jarrow Formulas", score: 4.1, reviews: 387, reason: "Long-term memory consolidation — requires 6–8 weeks of consistent use" },
+      { rank: 1, name: "Lion's Mane Mushroom", brand: "Host Defense", score: 4.7, reviews: 689, badge: "Rising Star", reason: "NGF stimulation linked to memory and long-term cognitive support", evidenceLevel: "emerging" },
+      { rank: 2, name: "Rhodiola Rosea", brand: "Gaia Herbs", score: 4.5, reviews: 521, reason: "Reduces mental fatigue during high cognitive load — popular with students", evidenceLevel: "emerging" },
+      { rank: 3, name: "Alpha-GPC", brand: "NOW Foods", score: 4.5, reviews: 448, reason: "Directly raises acetylcholine; users report sharper focus within hours", evidenceLevel: "emerging" },
+      { rank: 4, name: "L-Theanine + Caffeine", brand: "Nutricost", score: 4.4, reviews: 912, badge: "Starter Pick", reason: "Classic combo — smooth energy without the jitter crash", evidenceLevel: "strong" },
+      { rank: 5, name: "Bacopa Monnieri", brand: "Jarrow Formulas", score: 4.1, reviews: 387, reason: "Long-term memory consolidation — requires 6–8 weeks of consistent use", evidenceLevel: "emerging" },
     ],
   },
   {
@@ -98,11 +99,11 @@ const LISTS: SupplementList[] = [
     updatedAt: "Updated 5 days ago",
     saves: 1123,
     items: [
-      { rank: 1, name: "NMN (500mg)", brand: "ProHealth Longevity", score: 4.6, reviews: 543, badge: "Science-Backed", reason: "NAD+ precursor tied to mitochondrial function and cellular repair" },
-      { rank: 2, name: "Omega-3 Fish Oil", brand: "Nordic Naturals", score: 4.6, reviews: 1567, reason: "Reduces systemic inflammation — the single strongest correlate of longevity markers" },
-      { rank: 3, name: "Resveratrol", brand: "Life Extension", score: 4.2, reviews: 412, reason: "SIRT1 activator; stacks with NMN for synergistic NAD+ effect" },
-      { rank: 4, name: "Vitamin D3 + K2", brand: "Life Extension", score: 4.7, reviews: 987, badge: "Lab Verified", reason: "Deficiency independently associated with all-cause mortality in large cohorts" },
-      { rank: 5, name: "Coenzyme Q10", brand: "Jarrow Formulas", score: 4.3, reviews: 644, reason: "Essential for ATP production; supplementation becomes critical after 40" },
+      { rank: 1, name: "NMN (500mg)", brand: "ProHealth Longevity", score: 4.6, reviews: 543, badge: "Science-Backed", reason: "NAD+ precursor tied to mitochondrial function and cellular repair", evidenceLevel: "emerging" },
+      { rank: 2, name: "Omega-3 Fish Oil", brand: "Nordic Naturals", score: 4.6, reviews: 1567, reason: "Reduces systemic inflammation — the single strongest correlate of longevity markers", evidenceLevel: "strong" },
+      { rank: 3, name: "Resveratrol", brand: "Life Extension", score: 4.2, reviews: 412, reason: "SIRT1 activator; stacks with NMN for synergistic NAD+ effect", evidenceLevel: "emerging" },
+      { rank: 4, name: "Vitamin D3 + K2", brand: "Life Extension", score: 4.7, reviews: 987, badge: "Lab Verified", reason: "Deficiency independently associated with all-cause mortality in large cohorts", evidenceLevel: "strong" },
+      { rank: 5, name: "Coenzyme Q10", brand: "Jarrow Formulas", score: 4.3, reviews: 644, reason: "Essential for ATP production; supplementation becomes critical after 40", evidenceLevel: "emerging" },
     ],
   },
   {
@@ -115,11 +116,11 @@ const LISTS: SupplementList[] = [
     updatedAt: "Updated today",
     saves: 3041,
     items: [
-      { rank: 1, name: "Creatine Monohydrate", brand: "Multiple brands", score: 4.8, reviews: 2108, badge: "+34% reviews", reason: "Viral on social media — new users flooding in after broad wellness coverage" },
-      { rank: 2, name: "Apigenin", brand: "Swanson / Bulk", score: 4.2, reviews: 312, badge: "+89% reviews", reason: "Exploding in sleep optimization communities after podcast mentions" },
-      { rank: 3, name: "Magnesium Threonate", brand: "Life Extension", score: 4.4, reviews: 489, badge: "+52% reviews", reason: "Brain-penetrating form of magnesium gaining traction in nootropic circles" },
-      { rank: 4, name: "NMN", brand: "ProHealth", score: 4.6, reviews: 543, badge: "+41% reviews", reason: "Longevity research buzz driving significant new review volume" },
-      { rank: 5, name: "Tudca", brand: "Double Wood", score: 4.1, reviews: 198, badge: "+120% reviews", reason: "Liver health and gut barrier support — emerging category breakout" },
+      { rank: 1, name: "Creatine Monohydrate", brand: "Multiple brands", score: 4.8, reviews: 2108, badge: "+34% reviews", reason: "Viral on social media — new users flooding in after broad wellness coverage", evidenceLevel: "strong" },
+      { rank: 2, name: "Apigenin", brand: "Swanson / Bulk", score: 4.2, reviews: 312, badge: "+89% reviews", reason: "Exploding in sleep optimization communities after podcast mentions", evidenceLevel: "emerging" },
+      { rank: 3, name: "Magnesium Threonate", brand: "Life Extension", score: 4.4, reviews: 489, badge: "+52% reviews", reason: "Brain-penetrating form of magnesium gaining traction in nootropic circles", evidenceLevel: "emerging" },
+      { rank: 4, name: "NMN", brand: "ProHealth", score: 4.6, reviews: 543, badge: "+41% reviews", reason: "Longevity research buzz driving significant new review volume", evidenceLevel: "emerging" },
+      { rank: 5, name: "Tudca", brand: "Double Wood", score: 4.1, reviews: 198, badge: "+120% reviews", reason: "Liver health and gut barrier support — emerging category breakout", evidenceLevel: "limited" },
     ],
   },
   {
@@ -132,11 +133,11 @@ const LISTS: SupplementList[] = [
     updatedAt: "Updated 1 week ago",
     saves: 987,
     items: [
-      { rank: 1, name: "Creatine Monohydrate", brand: "BulkSupplements", score: 4.9, reviews: 2108, badge: "~$12/mo", reason: "Most evidence per dollar of any supplement — unmatched value" },
-      { rank: 2, name: "Vitamin D3 + K2", brand: "Sports Research", score: 4.6, reviews: 987, badge: "~$14/mo", reason: "Addresses one of the most common deficiencies at minimal cost" },
-      { rank: 3, name: "Magnesium Glycinate", brand: "NOW Foods", score: 4.7, reviews: 1100, badge: "~$18/mo", reason: "Generic brands perform identically to premium — huge savings opportunity" },
-      { rank: 4, name: "Omega-3 Fish Oil", brand: "Costco Kirkland", score: 4.4, reviews: 820, badge: "~$20/mo", reason: "Bulk purchasing cuts cost without sacrificing third-party tested quality" },
-      { rank: 5, name: "Zinc + Copper", brand: "NOW Foods", score: 4.3, reviews: 445, badge: "~$8/mo", reason: "Foundational mineral pair — essential for testosterone, immune, and thyroid function" },
+      { rank: 1, name: "Creatine Monohydrate", brand: "BulkSupplements", score: 4.9, reviews: 2108, badge: "~$12/mo", reason: "Most evidence per dollar of any supplement — unmatched value", evidenceLevel: "strong" },
+      { rank: 2, name: "Vitamin D3 + K2", brand: "Sports Research", score: 4.6, reviews: 987, badge: "~$14/mo", reason: "Addresses one of the most common deficiencies at minimal cost", evidenceLevel: "strong" },
+      { rank: 3, name: "Magnesium Glycinate", brand: "NOW Foods", score: 4.7, reviews: 1100, badge: "~$18/mo", reason: "Generic brands perform identically to premium — huge savings opportunity", evidenceLevel: "strong" },
+      { rank: 4, name: "Omega-3 Fish Oil", brand: "Costco Kirkland", score: 4.4, reviews: 820, badge: "~$20/mo", reason: "Bulk purchasing cuts cost without sacrificing third-party tested quality", evidenceLevel: "strong" },
+      { rank: 5, name: "Zinc + Copper", brand: "NOW Foods", score: 4.3, reviews: 445, badge: "~$8/mo", reason: "Foundational mineral pair — essential for testosterone, immune, and thyroid function", evidenceLevel: "limited" },
     ],
   },
 ];
@@ -228,6 +229,21 @@ function ListCard({ list, onSave, saved }: { list: SupplementList; saved: boolea
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold text-gray-900 text-sm">{item.name}</span>
+                {item.evidenceLevel === "strong" && (
+                  <span className="flex items-center gap-1 text-xs text-blue-700">
+                    <span className="w-2 h-2 rounded-full bg-blue-500 inline-block flex-shrink-0" />
+                    Strong Evidence
+                  </span>
+                )}
+                {item.evidenceLevel === "emerging" && (
+                  <span className="flex items-center gap-1 text-xs text-amber-700">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 inline-block flex-shrink-0" />
+                    Emerging
+                  </span>
+                )}
+                {item.evidenceLevel === "limited" && (
+                  <span className="w-2 h-2 rounded-full bg-gray-300 inline-block flex-shrink-0" />
+                )}
                 {item.badge && (
                   <span className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full font-medium">{item.badge}</span>
                 )}

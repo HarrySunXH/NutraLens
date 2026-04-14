@@ -6,6 +6,7 @@ import HowItWorks from "@/components/HowItWorks";
 import FeaturesBento from "@/components/FeaturesBento";
 import AIShowcase from "@/components/AIShowcase";
 import Testimonials from "@/components/Testimonials";
+import ScienceSection from "@/components/ScienceSection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 
@@ -21,6 +22,7 @@ export default function Home() {
         <FeaturesBento />
         <AIShowcase />
         <Testimonials />
+        <ScienceSection />
         <CTASection />
       </main>
       <Footer />

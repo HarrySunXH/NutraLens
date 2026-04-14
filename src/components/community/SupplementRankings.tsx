@@ -23,6 +23,7 @@ interface SupplementRank {
   goals: string[];
   trending: boolean;
   userTypes: string[];
+  evidenceLevel: "strong" | "emerging" | "limited";
 }
 
 const SUPPLEMENTS: SupplementRank[] = [
@@ -38,6 +39,7 @@ const SUPPLEMENTS: SupplementRank[] = [
     goals: ["Sleep", "Stress Relief", "Muscle Recovery"],
     trending: true,
     userTypes: ["Athletes", "Professionals", "Seniors"],
+    evidenceLevel: "strong",
   },
   {
     id: "2",
@@ -51,6 +53,7 @@ const SUPPLEMENTS: SupplementRank[] = [
     goals: ["Immunity", "Bone Health", "Longevity"],
     trending: false,
     userTypes: ["General Wellness", "Seniors", "Office Workers"],
+    evidenceLevel: "strong",
   },
   {
     id: "3",
@@ -64,6 +67,7 @@ const SUPPLEMENTS: SupplementRank[] = [
     goals: ["Muscle Mass", "Strength", "Athletic Performance"],
     trending: true,
     userTypes: ["Athletes", "Bodybuilders", "Fitness Enthusiasts"],
+    evidenceLevel: "strong",
   },
   {
     id: "4",
@@ -77,6 +81,7 @@ const SUPPLEMENTS: SupplementRank[] = [
     goals: ["Heart Health", "Brain Function", "Inflammation"],
     trending: false,
     userTypes: ["General Wellness", "Seniors", "Professionals"],
+    evidenceLevel: "strong",
   },
   {
     id: "5",
@@ -90,6 +95,7 @@ const SUPPLEMENTS: SupplementRank[] = [
     goals: ["Stress Relief", "Mental Performance", "Hormonal Balance"],
     trending: true,
     userTypes: ["Professionals", "Students", "Athletes"],
+    evidenceLevel: "emerging",
   },
   {
     id: "6",
@@ -103,6 +109,7 @@ const SUPPLEMENTS: SupplementRank[] = [
     goals: ["Joint Health", "Skin", "Hair & Nails"],
     trending: false,
     userTypes: ["Women 30+", "Athletes", "Seniors"],
+    evidenceLevel: "emerging",
   },
   {
     id: "7",
@@ -116,6 +123,7 @@ const SUPPLEMENTS: SupplementRank[] = [
     goals: ["Energy", "Heart Health", "Longevity"],
     trending: false,
     userTypes: ["Seniors", "Heart Health", "Statin Users"],
+    evidenceLevel: "emerging",
   },
 ];
 
@@ -155,6 +163,12 @@ function RatingStars({ score }: { score: number }) {
   );
 }
 
+const evidenceConfig = {
+  strong: { label: "Strong Evidence", color: "text-blue-700 bg-blue-50" },
+  emerging: { label: "Emerging", color: "text-amber-700 bg-amber-50" },
+  limited: { label: "Limited", color: "text-gray-600 bg-gray-100" },
+};
+
 function SupplementCard({ supp, rank }: { supp: SupplementRank; rank: number }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -190,6 +204,9 @@ function SupplementCard({ supp, rank }: { supp: SupplementRank; rank: number }) 
                       <TrendingUp className="w-3 h-3" /> Trending
                     </span>
                   )}
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${evidenceConfig[supp.evidenceLevel].color}`}>
+                    {evidenceConfig[supp.evidenceLevel].label}
+                  </span>
                 </div>
                 <p className="text-sm text-gray-500">{supp.brand} · {supp.category}</p>
               </div>

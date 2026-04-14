@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Award, MessageSquare, Users, List } from "lucide-react";
+import { Award, MessageSquare, Users, List, GraduationCap } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SupplementRankings from "@/components/community/SupplementRankings";
 import CommunityFeed from "@/components/community/CommunityFeed";
 import SimilarProfiles from "@/components/community/SimilarProfiles";
 import CommunityLists from "@/components/community/CommunityLists";
+import ExpertsTab from "@/components/community/ExpertsTab";
 import { HealthProfileProvider } from "@/context/HealthProfileContext";
 import Cart from "@/components/Cart";
 
@@ -29,6 +30,12 @@ const TABS = [
     label: "Community Feed",
     icon: MessageSquare,
     description: "Real outcomes shared by verified users",
+  },
+  {
+    id: "experts",
+    label: "Experts",
+    icon: GraduationCap,
+    description: "Verified dietitians and nutritionists you can consult",
   },
   {
     id: "similar",
@@ -147,6 +154,7 @@ function CommunityPageContent() {
         >
           {activeTab === "rankings" && <SupplementRankings />}
           {activeTab === "feed" && <CommunityFeed />}
+          {activeTab === "experts" && <ExpertsTab />}
           {activeTab === "similar" && <SimilarProfiles />}
           {activeTab === "lists" && <CommunityLists />}
         </motion.div>
