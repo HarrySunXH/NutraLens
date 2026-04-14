@@ -102,7 +102,7 @@ async function fetchExploreWidget(
 
 async function fetchTimelineData(
   widget: TrendsWidget
-): Promise<MultilineResponse["default"]["timelineData"]> {
+): Promise<TimelinePoint[]> {
   const payload = await fetchGoogleTrendsText(
     `/trends/api/widgetdata/multiline?hl=en-US&tz=240&token=${encodeURIComponent(
       widget.token || ""
