@@ -1,8 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Star, Bookmark, BookmarkCheck, ChevronRight, Flame, Sparkles, Clock, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Star,
+  Bookmark,
+  BookmarkCheck,
+  ChevronRight,
+  Flame,
+  Sparkles,
+  Clock,
+  ArrowRight,
+  TrendingUp,
+} from "lucide-react";
 
 interface ListItem {
   rank: number;
@@ -140,6 +150,22 @@ const CATEGORY_LABELS: Record<SupplementList["category"], string> = {
 
 const CATEGORY_FILTERS = ["All", "Featured", "By Goal", "Trending"] as const;
 
+interface LiveTrendItem {
+  keyword: string;
+  currentScore: number;
+  previousScore: number;
+  growthPercent: number;
+  peakScore: number;
+}
+
+interface LiveTrendsResponse {
+  updatedAt: string;
+  source: string;
+  geo: string;
+  period: string;
+  items: LiveTrendItem[];
+}
+
 function RankBadge({ rank }: { rank: number }) {
   const styles =
     rank === 1 ? "bg-amber-400 text-white" :
@@ -234,14 +260,47 @@ function ListCard({ list, onSave, saved }: { list: SupplementList; saved: boolea
   );
 }
 
+function LiveTrendCard({ item, rank }: { item: LiveTrendItem; rank: number }) {
+  const growthLabel = `${item.growthPercent >= 0 ? "+" : ""}${item.growthPercent}%`;
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-start gap-3">
+      <RankBadge rank={rank} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="font-semibold text-gray-900 text-sm">{item.keyword}</p>
+          <span className="text-xs px-2 py-0.5 bg-orange-50 text-orange-700 rounded-full font-medium">
+            {growthLabel}
+          </span>
+        </div>
+        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+          US Google search interest averaged {item.currentScore.toFixed(1)} this week, up from{" "}
+          {item.previousScore.toFixed(1)} the week before.
+        </p>
+      </div>
+      <div className="text-right flex-shrink-0">
+        <p className="text-xs text-gray-400">Peak</p>
+        <p className="text-sm font-semibold text-gray-800">{item.peakScore}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function CommunityLists() {
   const [filter, setFilter] = useState<typeof CATEGORY_FILTERS[number]>("All");
   const [savedLists, setSavedLists] = useState<Set<string>>(new Set());
+  const [liveTrends, setLiveTrends] = useState<LiveTrendsResponse | null>(null);
+  const [isLoadingTrends, setIsLoadingTrends] = useState(true);
+  const [trendsError, setTrendsError] = useState<string | null>(null);
 
   const toggleSave = (id: string) => {
     setSavedLists((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
       return next;
     });
   };
@@ -250,6 +309,42 @@ export default function CommunityLists() {
     if (filter === "All") return true;
     return CATEGORY_LABELS[l.category] === filter;
   });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLiveTrends = async () => {
+      try {
+        setIsLoadingTrends(true);
+        setTrendsError(null);
+
+        const response = await fetch("/api/community/trends");
+        if (!response.ok) {
+          throw new Error("Failed to load live trends");
+        }
+
+        const data = (await response.json()) as LiveTrendsResponse;
+        if (!cancelled) {
+          setLiveTrends(data);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Error loading live Google Trends:", error);
+          setTrendsError("Live Google Trends data is temporarily unavailable.");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingTrends(false);
+        }
+      }
+    };
+
+    loadLiveTrends();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -300,12 +395,60 @@ export default function CommunityLists() {
         <div className="flex items-center gap-1.5 text-xs font-semibold text-orange-500 flex-shrink-0">
           <Flame className="w-3.5 h-3.5" /> Trending:
         </div>
-        {["Creatine", "Apigenin", "NMN", "Magnesium Threonate", "Tudca"].map((name) => (
+        {(liveTrends?.items.length
+          ? liveTrends.items.map((item) => item.keyword)
+          : ["Creatine", "Berberine", "NMN", "Lion's Mane", "Electrolytes"]).map((name) => (
           <span key={name} className="flex-shrink-0 text-xs px-3 py-1.5 bg-orange-50 text-orange-700 border border-orange-100 rounded-full font-medium">
             {name}
           </span>
         ))}
       </div>
+
+      {/* Live trends */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 rounded-2xl p-5"
+      >
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 text-sm">Live Google Trends</p>
+                <p className="text-xs text-gray-500">
+                  Trending supplements ranked by US Google search momentum over the last 3 months
+                </p>
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400">
+            {liveTrends ? `Updated ${new Date(liveTrends.updatedAt).toLocaleString()}` : "Updating..."}
+          </p>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {isLoadingTrends && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 text-sm text-gray-500">
+              Loading live Google Trends data...
+            </div>
+          )}
+
+          {!isLoadingTrends && trendsError && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 text-sm text-gray-500">
+              {trendsError}
+            </div>
+          )}
+
+          {!isLoadingTrends &&
+            !trendsError &&
+            liveTrends?.items.map((item, index) => (
+              <LiveTrendCard key={item.keyword} item={item} rank={index + 1} />
+            ))}
+        </div>
+      </motion.div>
 
       {/* Filter tabs */}
       <div className="flex gap-2 flex-wrap">
