@@ -375,8 +375,9 @@ export default function Hero() {
           className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight"
         >
           Your Supplements,{" "}
+          <br />
           <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 bg-clip-text text-transparent">
-            Personalized
+            Personalized by Experts & Science
           </span>
         </motion.h1>
 
