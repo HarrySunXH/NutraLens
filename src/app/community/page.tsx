@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Award, MessageSquare, Users, List, GraduationCap } from "lucide-react";
+import { Award, MessageSquare, Users, List, GraduationCap, TrendingUp } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SupplementRankings from "@/components/community/SupplementRankings";
 import CommunityFeed from "@/components/community/CommunityFeed";
 import SimilarProfiles from "@/components/community/SimilarProfiles";
 import CommunityLists from "@/components/community/CommunityLists";
 import ExpertsTab from "@/components/community/ExpertsTab";
+import MyProgressTab from "@/components/community/MyProgressTab";
 import { HealthProfileProvider } from "@/context/HealthProfileContext";
 import Cart from "@/components/Cart";
 
@@ -42,6 +43,12 @@ const TABS = [
     label: "People Like You",
     icon: Users,
     description: "Matched users with similar health profiles",
+  },
+  {
+    id: "progress",
+    label: "My Progress",
+    icon: TrendingUp,
+    description: "Log your daily energy, mood, sleep, and symptoms to track your regimen",
   },
 ] as const;
 
@@ -157,6 +164,7 @@ function CommunityPageContent() {
           {activeTab === "experts" && <ExpertsTab />}
           {activeTab === "similar" && <SimilarProfiles />}
           {activeTab === "lists" && <CommunityLists />}
+          {activeTab === "progress" && <MyProgressTab />}
         </motion.div>
       </div>
 
