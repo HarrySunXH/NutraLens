@@ -376,7 +376,7 @@ export default function Hero() {
         >
           Your Supplements,{" "}
           <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 bg-clip-text text-transparent">
-            Personalized by AI
+            Personalized
           </span>
         </motion.h1>
 
