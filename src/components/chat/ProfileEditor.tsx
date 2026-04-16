@@ -485,6 +485,8 @@ function MedicalTab({ profile, onUpdate }: TabProps) {
 }
 
 function GoalsTab({ profile, onUpdate }: TabProps) {
+  const [customInput, setCustomInput] = useState("");
+
   const toggleGoal = (key: keyof HealthGoals) => {
     onUpdate({
       ...profile,
@@ -493,6 +495,8 @@ function GoalsTab({ profile, onUpdate }: TabProps) {
   };
 
   const goals: { key: keyof HealthGoals; label: string }[] = [
+    { key: "weightManagement", label: "Weight Management" },
+    { key: "appetiteControl", label: "Appetite Control" },
     { key: "fitness", label: "General Fitness" },
     { key: "muscleMass", label: "Muscle Mass" },
     { key: "strength", label: "Strength" },
@@ -501,22 +505,82 @@ function GoalsTab({ profile, onUpdate }: TabProps) {
     { key: "painMitigation", label: "Pain Mitigation" },
   ];
 
+  const addCustomGoal = () => {
+    const trimmed = customInput.trim();
+    if (!trimmed || profile.customGoals.includes(trimmed)) return;
+    onUpdate({
+      ...profile,
+      customGoals: [...profile.customGoals, trimmed],
+    });
+    setCustomInput("");
+  };
+
+  const removeCustomGoal = (goal: string) => {
+    onUpdate({
+      ...profile,
+      customGoals: profile.customGoals.filter((item) => item !== goal),
+    });
+  };
+
   return (
-    <div className="space-y-3 max-w-md">
-      {goals.map((goal) => (
-        <label
-          key={goal.key}
-          className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
-        >
-          <input
-            type="checkbox"
-            checked={profile.goals[goal.key]}
-            onChange={() => toggleGoal(goal.key)}
-            className="w-5 h-5 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500"
-          />
-          <span className="font-medium text-gray-700">{goal.label}</span>
+    <div className="space-y-5 max-w-md">
+      <div className="space-y-3">
+        {goals.map((goal) => (
+          <label
+            key={goal.key}
+            className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+          >
+            <input
+              type="checkbox"
+              checked={profile.goals[goal.key]}
+              onChange={() => toggleGoal(goal.key)}
+              className="w-5 h-5 rounded border-gray-300 text-emerald-500 focus:ring-emerald-500"
+            />
+            <span className="font-medium text-gray-700">{goal.label}</span>
+          </label>
+        ))}
+      </div>
+
+      <div className="pt-2 border-t border-gray-100">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Custom Goals
         </label>
-      ))}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCustomGoal())}
+            placeholder="Add your own goal..."
+            className="flex-1 px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
+          />
+          <button
+            onClick={addCustomGoal}
+            disabled={!customInput.trim()}
+            className="px-3 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition-colors disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+        </div>
+        {profile.customGoals.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {profile.customGoals.map((goal) => (
+              <span
+                key={goal}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-100 text-emerald-700 rounded-full text-sm"
+              >
+                {goal}
+                <button
+                  onClick={() => removeCustomGoal(goal)}
+                  className="hover:bg-emerald-200 rounded-full p-0.5 transition-colors"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
