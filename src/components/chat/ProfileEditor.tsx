@@ -28,7 +28,7 @@ export default function ProfileEditor({ isOpen, onClose }: ProfileEditorProps) {
 
   useEffect(() => {
     if (isOpen) {
-      setLocalProfile(profile);
+      queueMicrotask(() => setLocalProfile(profile));
     }
   }, [isOpen, profile]);
 

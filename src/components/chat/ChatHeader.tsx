@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Brain, Menu, Sparkles, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Brain, Sparkles, PanelLeftClose, PanelLeft } from "lucide-react";
 
 interface ChatHeaderProps {
   isTyping: boolean;

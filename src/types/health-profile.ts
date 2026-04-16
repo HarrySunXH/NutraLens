@@ -37,10 +37,20 @@ export interface LabData {
 }
 
 export interface HealthGoals {
+  weightManagement: boolean;
+  appetiteControl: boolean;
+  energy: boolean;
+  sleep: boolean;
+  stressRelief: boolean;
   fitness: boolean;
   muscleMass: boolean;
   strength: boolean;
   mentalPerformance: boolean;
+  immunity: boolean;
+  heartHealth: boolean;
+  digestiveHealth: boolean;
+  hormoneBalance: boolean;
+  skinHair: boolean;
   longevity: boolean;
   painMitigation: boolean;
 }
@@ -67,7 +77,10 @@ export interface HealthProfile {
   
   // Current Supplements
   currentSupplements: string[];
-  
+
+  // Custom Goals (user-typed)
+  customGoals: string[];
+
   // Metadata
   completedAt: string | null;
   lastUpdated: string;
@@ -83,10 +96,20 @@ export const defaultHealthProfile: HealthProfile = {
   digestiveConditions: [],
   otherConditions: [],
   goals: {
+    weightManagement: false,
+    appetiteControl: false,
+    energy: false,
+    sleep: false,
+    stressRelief: false,
     fitness: false,
     muscleMass: false,
     strength: false,
     mentalPerformance: false,
+    immunity: false,
+    heartHealth: false,
+    digestiveHealth: false,
+    hormoneBalance: false,
+    skinHair: false,
     longevity: false,
     painMitigation: false,
   },
@@ -96,6 +119,7 @@ export const defaultHealthProfile: HealthProfile = {
     generalHealth: {},
   },
   currentSupplements: [],
+  customGoals: [],
   completedAt: null,
   lastUpdated: new Date().toISOString(),
 };

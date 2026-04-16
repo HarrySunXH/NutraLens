@@ -143,15 +143,28 @@ export function formatProfileForAI(profile: HealthProfile): string {
     .filter(([, active]) => active)
     .map(([goal]) => {
       const labels: Record<string, string> = {
+        weightManagement: "Weight Management",
+        appetiteControl: "Appetite Control",
+        energy: "Energy & Vitality",
+        sleep: "Sleep Quality",
+        stressRelief: "Stress Relief",
         fitness: "General Fitness",
         muscleMass: "Muscle Mass",
         strength: "Strength",
         mentalPerformance: "Mental Performance",
+        immunity: "Immunity",
+        heartHealth: "Heart Health",
+        digestiveHealth: "Digestive Health",
+        hormoneBalance: "Hormone Balance",
+        skinHair: "Skin & Hair",
         longevity: "Longevity",
-        painMitigation: "Pain Mitigation",
+        painMitigation: "Pain Relief",
       };
       return labels[goal] || goal;
     });
+  if ((profile.customGoals?.length ?? 0) > 0) {
+    activeGoals.push(...(profile.customGoals ?? []));
+  }
   if (activeGoals.length > 0) {
     parts.push(`Health Goals: ${activeGoals.join(", ")}`);
   }

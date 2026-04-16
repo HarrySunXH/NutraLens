@@ -213,11 +213,13 @@ export default function MyProgressTab() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    const data = loadCheckIns();
-    setCheckIns(data);
-    const today = todayStr();
-    if (data.find((c) => c.date === today)) setSubmitted(true);
+    queueMicrotask(() => {
+      setMounted(true);
+      const data = loadCheckIns();
+      setCheckIns(data);
+      const today = todayStr();
+      if (data.find((c) => c.date === today)) setSubmitted(true);
+    });
   }, []);
 
   const handleSubmit = () => {
@@ -268,7 +270,7 @@ export default function MyProgressTab() {
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
               <Plus className="w-4 h-4 text-white" />
             </div>
-            <h3 className="font-bold text-gray-900 text-sm">Today's Check-In</h3>
+            <h3 className="font-bold text-gray-900 text-sm">Today&apos;s Check-In</h3>
           </div>
           <span className="text-xs text-gray-400">
             {new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}
@@ -308,7 +310,7 @@ export default function MyProgressTab() {
                   onClick={() => setSubmitted(false)}
                   className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
                 >
-                  Edit today's entry
+                  Edit today&apos;s entry
                 </button>
               </motion.div>
             ) : (
@@ -345,7 +347,7 @@ export default function MyProgressTab() {
                   disabled={!draft.energy || !draft.mood || !draft.sleep || !draft.symptoms}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:from-emerald-600 hover:to-teal-600 transition-all shadow-sm"
                 >
-                  Save Today's Check-In
+                  Save Today&apos;s Check-In
                 </button>
               </motion.div>
             )}

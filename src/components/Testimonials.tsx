@@ -119,7 +119,7 @@ export default function Testimonials() {
 
                     {/* Quote */}
                     <p className="text-gray-700 leading-relaxed mb-6 relative z-10">
-                      "{testimonial.quote}"
+                      &quot;{testimonial.quote}&quot;
                     </p>
 
                     {/* Author */}

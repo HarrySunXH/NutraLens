@@ -31,15 +31,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as CartItem[];
-        setItems(parsed);
+    queueMicrotask(() => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored) as CartItem[];
+          setItems(parsed);
+        }
+      } catch (error) {
+        console.error("Error loading cart:", error);
       }
-    } catch (error) {
-      console.error("Error loading cart:", error);
-    }
+    });
   }, []);
 
   // Save cart to localStorage whenever it changes

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Brain, Shield, Award, Zap } from "lucide-react";
-import { fadeInUp, slideInLeft, slideInRight } from "@/lib/animations";
+import { slideInLeft, slideInRight } from "@/lib/animations";
 
 const capabilities = [
   {

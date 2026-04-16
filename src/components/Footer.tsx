@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Leaf, Mail, Twitter, Linkedin, Instagram, Github } from "lucide-react";
 import Link from "next/link";
-import { fadeInUp } from "@/lib/animations";
 
 const footerLinks = {
   product: [

@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, X, Image as ImageIcon, FileText } from "lucide-react";
+import Image from "next/image";
 
 interface FileUploadProps {
   onFileSelect: (file: File | null) => void;
@@ -24,20 +25,7 @@ export default function FileUpload({ onFileSelect, selectedFile }: FileUploadPro
     setIsDragging(false);
   }, []);
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragging(false);
-
-      const file = e.dataTransfer.files[0];
-      if (file && (file.type.startsWith("image/") || file.type === "application/pdf")) {
-        handleFileSelection(file);
-      }
-    },
-    []
-  );
-
-  const handleFileSelection = (file: File) => {
+  const handleFileSelection = useCallback((file: File) => {
     onFileSelect(file);
 
     if (file.type.startsWith("image/")) {
@@ -49,7 +37,20 @@ export default function FileUpload({ onFileSelect, selectedFile }: FileUploadPro
     } else {
       setPreview(null);
     }
-  };
+  }, [onFileSelect]);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+
+      const file = e.dataTransfer.files[0];
+      if (file && (file.type.startsWith("image/") || file.type === "application/pdf")) {
+        handleFileSelection(file);
+      }
+    },
+    [handleFileSelection]
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -88,9 +89,12 @@ export default function FileUpload({ onFileSelect, selectedFile }: FileUploadPro
           >
             {preview ? (
               <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                <img
+                <Image
                   src={preview}
                   alt="Preview"
+                  width={48}
+                  height={48}
+                  unoptimized
                   className="w-full h-full object-cover"
                 />
               </div>

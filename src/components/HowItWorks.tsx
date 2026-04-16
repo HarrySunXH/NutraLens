@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { ClipboardList, Brain, CheckCircle2, TrendingUp } from "lucide-react";
 import { fadeInUp, staggerContainer } from "@/lib/animations";
-import { useRouter } from "next/navigation";
 
 const steps = [
   {

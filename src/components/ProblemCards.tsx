@@ -47,11 +47,11 @@ export default function ProblemCards() {
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             The Problem With{" "}
             <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              Today's Supplements
+              Today&apos;s Supplements
             </span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Millions consume supplements daily, but most do it in a way that's ineffective, unsafe, or wasteful.
+            Millions consume supplements daily, but most do it in a way that&apos;s ineffective, unsafe, or wasteful.
           </p>
         </motion.div>
 

@@ -125,10 +125,52 @@ const SUPPLEMENTS: SupplementRank[] = [
     userTypes: ["Seniors", "Heart Health", "Statin Users"],
     evidenceLevel: "emerging",
   },
+  {
+    id: "8",
+    rank: 8,
+    name: "Berberine",
+    brand: "Thorne Research",
+    category: "Metabolic",
+    overallScore: 4.6,
+    dimensions: { ingredientQuality: 4.7, effectiveness: 4.6, dosageExperience: 4.3, userTypeMatch: 4.7 },
+    totalReviews: 876,
+    goals: ["Weight Management", "Appetite Control", "Blood Sugar"],
+    trending: true,
+    userTypes: ["Weight Management", "Metabolic Health", "Blood Sugar Support"],
+    evidenceLevel: "strong",
+  },
+  {
+    id: "9",
+    rank: 9,
+    name: "Glucomannan",
+    brand: "NOW Foods",
+    category: "Fiber",
+    overallScore: 4.3,
+    dimensions: { ingredientQuality: 4.4, effectiveness: 4.3, dosageExperience: 4.0, userTypeMatch: 4.5 },
+    totalReviews: 543,
+    goals: ["Weight Management", "Appetite Control", "Digestive Health"],
+    trending: true,
+    userTypes: ["Weight Management", "Dieters", "Blood Sugar Management"],
+    evidenceLevel: "strong",
+  },
+  {
+    id: "10",
+    rank: 10,
+    name: "L-Carnitine",
+    brand: "NOW Foods",
+    category: "Metabolic",
+    overallScore: 3.9,
+    dimensions: { ingredientQuality: 4.2, effectiveness: 3.7, dosageExperience: 4.4, userTypeMatch: 3.8 },
+    totalReviews: 789,
+    goals: ["Weight Management", "Energy", "Athletic Performance"],
+    trending: false,
+    userTypes: ["Weight Management", "Athletes", "Dieters"],
+    evidenceLevel: "emerging",
+  },
 ];
 
-const CATEGORIES = ["All", "Vitamins", "Minerals", "Performance", "Adaptogens", "Essential Fats", "Proteins", "Antioxidants"];
-const GOALS = ["All", "Sleep", "Muscle Mass", "Stress Relief", "Immunity", "Energy", "Joint Health", "Mental Performance"];
+const CATEGORIES = ["All", "Metabolic", "Fiber", "Vitamins", "Minerals", "Performance", "Adaptogens", "Essential Fats", "Proteins", "Antioxidants"];
+const GOALS = ["All", "Weight Management", "Appetite Control", "Energy", "Sleep", "Stress Relief", "Immunity", "Mental Performance", "Blood Sugar"];
 
 const DIMENSION_LABELS: Record<keyof DimensionScore, string> = {
   ingredientQuality: "Ingredient Quality",

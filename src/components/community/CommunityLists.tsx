@@ -39,6 +39,23 @@ interface SupplementList {
 
 const LISTS: SupplementList[] = [
   {
+    id: "weight-management",
+    title: "Top 5 for Weight Management",
+    subtitle: "Evidence-based supplements for fat loss, appetite control, and metabolic support — ranked by 2,600+ reviews",
+    category: "featured",
+    emoji: "⚖️",
+    gradient: "from-rose-500 to-pink-600",
+    updatedAt: "Updated 1 day ago",
+    saves: 2674,
+    items: [
+      { rank: 1, name: "Berberine", brand: "Thorne Research", score: 4.7, reviews: 876, badge: "Most Effective", reason: "Activates AMPK pathway — comparable to metformin for blood sugar and appetite regulation. Strong evidence for reducing cravings.", evidenceLevel: "strong" },
+      { rank: 2, name: "Whey Protein Isolate", brand: "Dymatize", score: 4.7, reviews: 1430, badge: "Satiety #1", reason: "High protein intake is the single most evidence-backed strategy for maintaining muscle while in a calorie deficit", evidenceLevel: "strong" },
+      { rank: 3, name: "Glucomannan", brand: "NOW Foods", score: 4.4, reviews: 543, reason: "Soluble fiber expands in stomach — clinical trials show significant appetite reduction when taken 30 min before meals", evidenceLevel: "strong" },
+      { rank: 4, name: "Green Tea Extract (EGCG)", brand: "Jarrow Formulas", score: 4.1, reviews: 612, badge: "Stimulant-Free Option", reason: "Modest but consistent metabolic boost — preferred by users who want fat loss support without strong stimulants", evidenceLevel: "emerging" },
+      { rank: 5, name: "L-Carnitine", brand: "NOW Foods", score: 3.8, reviews: 789, reason: "Facilitates fatty acid transport into mitochondria — most effective combined with a calorie deficit and consistent exercise", evidenceLevel: "emerging" },
+    ],
+  },
+  {
     id: "best-sleep",
     title: "Top 5 for Better Sleep",
     subtitle: "Highest-rated supplements for sleep quality and duration, based on 3,200+ reviews",
@@ -392,12 +409,12 @@ export default function CommunityLists() {
         <div className="flex-1">
           <p className="font-semibold text-emerald-900 text-sm">Editor&rsquo;s Pick This Week</p>
           <p className="text-xs text-emerald-700 mt-0.5">
-            <span className="font-medium">Top 5 for Longevity</span> — our most-saved list, updated with new clinical data
+            <span className="font-medium">Top 5 for Weight Management</span> — evidence-ranked picks for fat loss, appetite, and metabolic support
           </p>
         </div>
         <button
           onClick={() => {
-            const el = document.getElementById("list-longevity");
+            const el = document.getElementById("list-weight-management");
             el?.scrollIntoView({ behavior: "smooth", block: "start" });
           }}
           className="flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 transition-colors flex-shrink-0"
@@ -413,7 +430,7 @@ export default function CommunityLists() {
         </div>
         {(liveTrends?.items.length
           ? liveTrends.items.map((item) => item.keyword)
-          : ["Creatine", "Berberine", "NMN", "Lion's Mane", "Electrolytes"]).map((name) => (
+          : ["Berberine", "Glucomannan", "L-Carnitine", "Protein", "Semaglutide"]).map((name) => (
           <span key={name} className="flex-shrink-0 text-xs px-3 py-1.5 bg-orange-50 text-orange-700 border border-orange-100 rounded-full font-medium">
             {name}
           </span>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { HealthProfile, defaultHealthProfile } from "@/types/health-profile";
 import ProgressBar from "./ProgressBar";
 import StepBasicInfo from "./StepBasicInfo";
@@ -22,7 +22,6 @@ const STEP_TITLES = ["Basic Info", "Medical", "Goals", "Lab Results", "Supplemen
 
 export default function OnboardingModal({
   isOpen,
-  onClose,
   onComplete,
   initialProfile,
 }: OnboardingModalProps) {
@@ -32,8 +31,10 @@ export default function OnboardingModal({
   // Reset when modal opens
   useEffect(() => {
     if (isOpen) {
-      setCurrentStep(0);
-      setProfile(initialProfile || defaultHealthProfile);
+      queueMicrotask(() => {
+        setCurrentStep(0);
+        setProfile(initialProfile || defaultHealthProfile);
+      });
     }
   }, [isOpen, initialProfile]);
 

@@ -5,11 +5,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import { ComponentPropsWithoutRef } from "react";
-import { ExternalLink, ShoppingCart, ImageOff, ChevronLeft, ChevronRight, BookOpen, Plus } from "lucide-react";
+import { ExternalLink, ShoppingCart, ChevronLeft, ChevronRight, BookOpen, Plus } from "lucide-react";
 import Image from "next/image";
 import DietitianSlider from "./DietitianCard";
 import QuestionCard from "./QuestionCard";
-import { parseQuestions, ParsedQuestion } from "@/utils/parseQuestions";
+import { parseQuestions } from "@/utils/parseQuestions";
 import { useCart } from "@/context/CartContext";
 
 interface SupplementProduct {
@@ -802,6 +802,8 @@ export default function MessageContent({
 
           // Images
           img: ({ src, alt, ...props }) => (
+            // Markdown content can reference arbitrary remote image hosts that are not known at build time.
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={src}
               alt={alt}

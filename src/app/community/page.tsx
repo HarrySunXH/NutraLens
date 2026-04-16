@@ -83,7 +83,7 @@ function CommunityPageContent() {
             </span>
           </h1>
           <p className="mt-3 text-gray-500 leading-relaxed">
-            Explore crowd-sourced supplement rankings, read real outcomes from users who share your health goals, and discover what's working for people just like you.
+            Explore crowd-sourced supplement rankings, read real outcomes from users who share your health goals, and discover what&apos;s working for people just like you.
           </p>
         </motion.div>
 

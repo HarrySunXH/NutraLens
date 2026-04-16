@@ -4,24 +4,23 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Leaf, Menu, X, MessageSquare, ShoppingCart, Users } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+
+const navLinks = [
+  { href: "#how-it-works", label: "How It Works", id: "how-it-works", isSection: true },
+  { href: "#features", label: "Features", id: "features", isSection: true },
+  { href: "/chat", label: "AI Chat", id: "chat", isSection: false },
+  { href: "/community", label: "Community", id: "community", isSection: false },
+];
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const pathname = usePathname();
-  const router = useRouter();
   const isHomePage = pathname === "/";
   const { setIsOpen, itemCount } = useCart();
-
-  const navLinks = [
-    { href: "#how-it-works", label: "How It Works", id: "how-it-works", isSection: true },
-    { href: "#features", label: "Features", id: "features", isSection: true },
-    { href: "/chat", label: "AI Chat", id: "chat", isSection: false },
-    { href: "/community", label: "Community", id: "community", isSection: false },
-  ];
 
   useEffect(() => {
     const handleScroll = () => {

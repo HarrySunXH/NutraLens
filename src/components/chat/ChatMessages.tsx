@@ -3,8 +3,8 @@
 import { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Brain, User } from "lucide-react";
-import TypingIndicator from "./TypingIndicator";
 import MessageContent from "./MessageContent";
+import Image from "next/image";
 
 export interface SupplementProduct {
   title: string;
@@ -60,14 +60,6 @@ export default function ChatMessages({ messages, isTyping, isStreaming = false, 
     }
   }, [messages, isTyping, isStreaming]);
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  };
-
   return (
     <div
       ref={containerRef}
@@ -110,9 +102,12 @@ export default function ChatMessages({ messages, isTyping, isStreaming = false, 
                     <div className="mb-2 flex justify-end pr-12">
                       <div className="bg-gray-100 rounded-xl p-2 inline-flex items-center gap-2">
                         {message.file.preview ? (
-                          <img
+                          <Image
                             src={message.file.preview}
                             alt={message.file.name}
+                            width={80}
+                            height={80}
+                            unoptimized
                             className="w-20 h-20 rounded-lg object-cover"
                           />
                         ) : (

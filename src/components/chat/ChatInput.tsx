@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Send, Paperclip, X, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 interface ChatInputProps {
   onSendMessage: (message: string, file?: File | null) => void;
@@ -86,9 +87,12 @@ export default function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
             >
               {filePreview ? (
                 <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                  <img
+                  <Image
                     src={filePreview}
                     alt="Preview"
+                    width={48}
+                    height={48}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 </div>

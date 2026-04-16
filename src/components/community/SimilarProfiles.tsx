@@ -19,59 +19,59 @@ interface SimilarUser {
 const MOCK_SIMILAR_USERS: SimilarUser[] = [
   {
     id: "1",
-    handle: "User_A47F",
-    age: 31,
+    handle: "User_F22K",
+    age: 34,
     matchScore: 94,
-    sharedGoals: ["Muscle Mass", "Strength"],
+    sharedGoals: ["Weight Management", "Appetite Control"],
     topSupplements: [
-      { name: "Creatine Monohydrate", rating: 5, weeks: 12 },
-      { name: "Whey Protein", rating: 5, weeks: 24 },
-      { name: "Vitamin D3", rating: 4, weeks: 16 },
+      { name: "Berberine", rating: 5, weeks: 12 },
+      { name: "Glucomannan", rating: 4, weeks: 10 },
+      { name: "Whey Protein Isolate", rating: 5, weeks: 16 },
     ],
     conditions: [],
-    outcome: "Gained 8 lbs of lean muscle over 3 months. Strength increased significantly across all main lifts.",
+    outcome: "Lost 12 lbs over 3 months on a calorie deficit. Berberine stabilized blood sugar cravings, glucomannan made me feel fuller before meals. Didn't need to rely on willpower as much — that was the real difference.",
   },
   {
     id: "2",
-    handle: "User_B93C",
+    handle: "User_R58T",
     age: 29,
     matchScore: 91,
-    sharedGoals: ["Sleep", "Stress Relief", "Mental Performance"],
+    sharedGoals: ["Weight Management", "Energy"],
     topSupplements: [
-      { name: "Magnesium Glycinate", rating: 5, weeks: 8 },
-      { name: "Ashwagandha KSM-66", rating: 4, weeks: 10 },
-      { name: "L-Theanine", rating: 4, weeks: 6 },
+      { name: "L-Carnitine", rating: 3, weeks: 8 },
+      { name: "B-Complex", rating: 4, weeks: 12 },
+      { name: "Green Tea Extract", rating: 3, weeks: 10 },
     ],
     conditions: [],
-    outcome: "Sleep quality improved dramatically. Stress feels manageable and focus during work hours is noticeably better.",
+    outcome: "L-carnitine gave modest energy during workouts but I didn't see dramatic fat loss. The real win was B-complex keeping my energy up while eating at a deficit. Don't expect fat burners alone to do the work.",
   },
   {
     id: "3",
-    handle: "User_D12K",
-    age: 44,
-    matchScore: 88,
-    sharedGoals: ["Longevity", "Joint Health", "Immunity"],
+    handle: "User_M74P",
+    age: 38,
+    matchScore: 87,
+    sharedGoals: ["Appetite Control", "Hormone Balance", "Weight Management"],
     topSupplements: [
-      { name: "Omega-3 Fish Oil", rating: 5, weeks: 20 },
-      { name: "Vitamin D3 + K2", rating: 5, weeks: 24 },
-      { name: "Collagen Peptides", rating: 4, weeks: 12 },
+      { name: "Berberine", rating: 5, weeks: 16 },
+      { name: "Vitamin D3", rating: 5, weeks: 20 },
+      { name: "Magnesium Glycinate", rating: 4, weeks: 12 },
     ],
-    conditions: ["Digestive sensitivity"],
-    outcome: "Blood markers improved at 6-month checkup. Joint pain reduced enough to resume hiking. Worth the consistency.",
+    conditions: ["Low vitamin D (corrected)"],
+    outcome: "Vitamin D was deficient on my blood panel — fixing that improved mood and energy while dieting. Berberine was a game changer for appetite and cravings. These two together made weight loss feel much less like a fight.",
   },
   {
     id: "4",
-    handle: "User_G88R",
-    age: 27,
-    matchScore: 85,
-    sharedGoals: ["Mental Performance", "Energy"],
+    handle: "User_J91S",
+    age: 31,
+    matchScore: 83,
+    sharedGoals: ["Weight Management", "Stress Relief", "Sleep"],
     topSupplements: [
-      { name: "Lion's Mane Mushroom", rating: 5, weeks: 8 },
-      { name: "Rhodiola Rosea", rating: 4, weeks: 6 },
-      { name: "B-Complex", rating: 4, weeks: 12 },
+      { name: "Ashwagandha KSM-66", rating: 5, weeks: 10 },
+      { name: "Magnesium Glycinate", rating: 5, weeks: 14 },
+      { name: "Protein Powder", rating: 4, weeks: 20 },
     ],
     conditions: [],
-    outcome: "Cognitive clarity during long study sessions has been consistently better. Energy doesn't crash in the afternoon anymore.",
+    outcome: "High cortisol was making me hold weight around the midsection. Ashwagandha and magnesium improved sleep dramatically. Stress eating reduced too — I think the cortisol connection to weight is massively underrated.",
   },
 ];
 
@@ -144,7 +144,7 @@ function SimilarUserCard({ user }: { user: SimilarUser }) {
 
         {/* Outcome quote */}
         <blockquote className="mt-3 text-sm text-gray-600 italic pl-3 border-l-2 border-emerald-300 leading-relaxed">
-          "{user.outcome}"
+          &quot;{user.outcome}&quot;
         </blockquote>
 
         {/* Expand toggle */}
@@ -168,7 +168,7 @@ function EmptyProfileState() {
       </div>
       <h3 className="font-bold text-gray-900 mb-2">Complete Your Profile</h3>
       <p className="text-sm text-gray-500 max-w-xs mx-auto leading-relaxed">
-        Fill in your health goals, conditions, and lab data to get matched with users who share your profile and see what's working for them.
+        Fill in your health goals, conditions, and lab data to get matched with users who share your profile and see what&apos;s working for them.
       </p>
       <a
         href="/chat"
@@ -211,12 +211,22 @@ export default function SimilarProfiles() {
     .filter(([, v]) => v)
     .map(([k]) => {
       const labels: Record<string, string> = {
+        weightManagement: "Weight Management",
+        appetiteControl: "Appetite Control",
+        energy: "Energy",
+        sleep: "Sleep",
+        stressRelief: "Stress Relief",
         fitness: "Fitness",
         muscleMass: "Muscle Mass",
         strength: "Strength",
         mentalPerformance: "Mental Performance",
+        immunity: "Immunity",
+        heartHealth: "Heart Health",
+        digestiveHealth: "Digestive Health",
+        hormoneBalance: "Hormone Balance",
+        skinHair: "Skin & Hair",
         longevity: "Longevity",
-        painMitigation: "Pain Mitigation",
+        painMitigation: "Pain Relief",
       };
       return labels[k] || k;
     });
@@ -231,7 +241,7 @@ export default function SimilarProfiles() {
       <div>
         <h2 className="text-xl font-bold text-gray-900">People Like You</h2>
         <p className="text-sm text-gray-500 mt-1">
-          Users with similar health profiles, goals, and conditions — see what's working for them
+          Users with similar health profiles, goals, and conditions — see what&apos;s working for them
         </p>
       </div>
 

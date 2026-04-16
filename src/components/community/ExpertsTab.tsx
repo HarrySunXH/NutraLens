@@ -18,11 +18,12 @@ import { dietitians, type Dietitian } from "@/components/chat/DietitianCard";
 
 const SPECIALTIES = [
   "All",
-  "Sports Nutrition",
+  "Weight Management",
   "Metabolic Health",
   "Women's Health",
+  "Sports Nutrition",
+  "Digestive Health",
   "Longevity",
-  "Mental Wellness",
 ];
 
 function getEmail(name: string): string {

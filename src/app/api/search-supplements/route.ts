@@ -68,7 +68,6 @@ function extractSource(url: string): string {
 
 // Partner retailers to prioritize
 const PARTNER_RETAILERS = ["cvs.com", "walgreens.com", "gnc.com"];
-const PARTNER_NAMES = ["CVS", "Walgreens", "GNC"];
 
 // Check if URL is from a partner retailer
 function isPartnerRetailer(url: string): boolean {
