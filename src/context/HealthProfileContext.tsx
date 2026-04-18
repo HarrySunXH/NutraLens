@@ -27,8 +27,22 @@ export function HealthProfileProvider({ children }: { children: ReactNode }) {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored) as HealthProfile;
-        setProfile(parsed);
+        const parsed = JSON.parse(stored);
+        const merged: HealthProfile = {
+          ...defaultHealthProfile,
+          ...parsed,
+          goals: {
+            ...defaultHealthProfile.goals,
+            ...(parsed.goals || {}),
+          },
+          labData: {
+            hormones: { ...defaultHealthProfile.labData.hormones, ...(parsed.labData?.hormones || {}) },
+            vitamins: { ...defaultHealthProfile.labData.vitamins, ...(parsed.labData?.vitamins || {}) },
+            generalHealth: { ...defaultHealthProfile.labData.generalHealth, ...(parsed.labData?.generalHealth || {}) },
+          },
+          customGoals: parsed.customGoals ?? [],
+        };
+        setProfile(merged);
         // Don't show onboarding if already completed
         if (!parsed.completedAt) {
           setShowOnboarding(true);
